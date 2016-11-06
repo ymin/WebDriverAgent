@@ -17,8 +17,13 @@
 #import "FBLogger.h"
 #import "XCUIDevice+FBHelpers.h"
 
+
 static NSString *const FBServerURLBeginMarker = @"ServerURLHere->";
 static NSString *const FBServerURLEndMarker = @"<-ServerURLHere";
+static NSString *const DeviceLanguageBeginMarker = @"DeviceLanguage->";
+static NSString *const DeviceLanguageEndMarker = @"<-DeviceLanguage";
+static NSString *const DeviceLocaleBeginMarker = @"DeviceLocale->";
+static NSString *const DeviceLocaleEndMarker = @"<-DeviceLocale";
 
 @interface UITestingUITests : FBFailureProofTestCase
 @end
@@ -35,9 +40,21 @@ static NSString *const FBServerURLEndMarker = @"<-ServerURLHere";
 /**
  Given back ip address before run testRunner, fix for one of our device which doesn't show ip in logs 
  */
-- (void)testIpAddress
+- (void)testDeviceInfo
 {
- [FBLogger logFmt:@"%@http://%@:8100%@", FBServerURLBeginMarker, [XCUIDevice sharedDevice].fb_wifiIPAddress, FBServerURLEndMarker];
+  NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+  [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSS"];
+  NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
+    
+  NSString *str = [NSString stringWithFormat:@"%@ %@http://%@:8100%@", dateString, FBServerURLBeginMarker, [XCUIDevice sharedDevice].fb_wifiIPAddress, FBServerURLEndMarker];
+    
+  NSString *language = [NSString stringWithFormat: @"%@ %@%@%@", dateString, DeviceLanguageBeginMarker, [[[NSBundle mainBundle] preferredLocalizations] objectAtIndex:0], DeviceLanguageEndMarker];
+    
+  NSString *locale = [NSString stringWithFormat: @"%@ %@%@%@", dateString, DeviceLocaleBeginMarker, [[NSLocale currentLocale] localeIdentifier], DeviceLocaleEndMarker];
+    
+  printf("%s\n", [str UTF8String]);
+  printf("%s\n", [language UTF8String]);
+  printf("%s\n", [locale UTF8String]);
 }
 
 /**
