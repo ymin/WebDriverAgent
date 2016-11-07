@@ -47,8 +47,8 @@ static NSString *const DeviceLocaleEndMarker = @"<-DeviceLocale";
   NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
     
   NSString *str = [NSString stringWithFormat:@"%@ %@http://%@:8100%@", dateString, FBServerURLBeginMarker, [XCUIDevice sharedDevice].fb_wifiIPAddress, FBServerURLEndMarker];
-    
-  NSString *language = [NSString stringWithFormat: @"%@ %@%@%@", dateString, DeviceLanguageBeginMarker, [[[NSBundle mainBundle] preferredLocalizations] objectAtIndex:0], DeviceLanguageEndMarker];
+
+  NSString *language = [NSString stringWithFormat: @"%@ %@%@%@", dateString, DeviceLanguageBeginMarker, [[NSLocale preferredLanguages] objectAtIndex:0], DeviceLanguageEndMarker];
     
   NSString *locale = [NSString stringWithFormat: @"%@ %@%@%@", dateString, DeviceLocaleBeginMarker, [[NSLocale currentLocale] localeIdentifier], DeviceLocaleEndMarker];
     
