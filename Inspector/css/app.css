@@ -50,3 +50,8 @@ html, body, #app {
 
 .section-content {
 }
+
+.section-button {
+  display: block;  
+  text-align: center;
+}

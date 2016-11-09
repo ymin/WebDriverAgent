@@ -9,11 +9,12 @@
 
 import Ajax from 'simple-ajax';
 
-class Http {
+class Http { 
+  
   static get(path, callback) {
     let ajax = new Ajax({
       url: path,
-      method: 'GET',
+      method: 'GET'
     });
     ajax.on('success', event => {
       var response = JSON.parse(event.target.responseText);
@@ -22,14 +23,40 @@ class Http {
     ajax.send();
   }
 
-  static post(path, callback) {
+  static post(path, post_data, callback) {
     let ajax = new Ajax({
       url: path,
       method: 'POST',
+      data: post_data
     });
     ajax.on('success', event => {
       var response = JSON.parse(event.target.responseText);
-      callback(response.value);
+      callback == undefined ? console.log('No response') : callback(response.value);
+    });
+    ajax.send();
+  }
+
+  static fget(path, callback) {
+    let ajax = new Ajax({
+      url: path,
+      method: 'GET'
+    });
+    ajax.on('success', event => {
+      var response = JSON.parse(event.target.responseText);
+      callback(response);
+    });
+    ajax.send();
+  }
+
+  static fpost(path, post_data, callback) {
+    let ajax = new Ajax({
+      url: path,
+      method: 'POST',
+      data: post_data
+    });
+    ajax.on('success', event => {
+      var response = JSON.parse(event.target.responseText);
+      callback == undefined ? console.log('No response') : callback(response);
     });
     ajax.send();
   }

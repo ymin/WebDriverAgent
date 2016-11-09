@@ -22,6 +22,9 @@
     [[FBRoute GET:@"/inspector.js"].withoutSession respondWithBlock: ^ id<FBResponsePayload> (FBRouteRequest *request) {
         return FBResponseFileWithPath([[self class] inspectorJSFilePath]);
     }],
+    [[FBRoute GET:@"/image/home_button.png"].withoutSession respondWithBlock: ^ id<FBResponsePayload> (FBRouteRequest *request) {
+        return FBResponseFileWithPath([[self class] inspectorHomeButtonImageFilePath]);
+    }],
   ];
 }
 
@@ -45,6 +48,11 @@
 + (NSString *)inspectorJSFilePath
 {
     return [[self inspectorResourcesBundle] pathForResource:@"inspector" ofType:@"js"];
+}
+
++ (NSString *)inspectorHomeButtonImageFilePath
+{
+    return [[self inspectorResourcesBundle] pathForResource:@"image/home_button" ofType:@"png"];
 }
 
 @end

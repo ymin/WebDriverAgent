@@ -71,6 +71,7 @@ function build_inspector() {
     exit 1
   fi
   cp "$INSPECTOR_DIR/index.html" "$RESOURCE_BUNDLE_DIR"
+  cp -r "$INSPECTOR_DIR/image" "$RESOURCE_BUNDLE_DIR"
 
   echo "Done"
 }

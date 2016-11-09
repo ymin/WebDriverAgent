@@ -44,6 +44,7 @@ class ImageUtils {
     image.onload = function() {
       callback(image);
     };
+
   }
 }
 
