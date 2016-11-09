@@ -43,6 +43,11 @@
   return [self.class dictionaryForElement:self.lastSnapshot];
 }
 
+- (NSDictionary *)fb_visibleTree
+{
+  return [self.class dictionaryForVisibleElement:self.lastSnapshot];
+}
+
 - (NSDictionary *)fb_accessibilityTree
 {
   // We ignore all elements except for the main window for accessibility tree
@@ -51,7 +56,8 @@
 
 + (NSDictionary *)dictionaryForElement:(XCElementSnapshot *)snapshot
 {
-  NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
+//  NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
+  NSMutableDictionary *info = [NSMutableDictionary dictionary];
   info[@"type"] = [FBElementTypeTransformer shortStringWithElementType:snapshot.elementType];
   info[@"rawIdentifier"] = FBValueOrNull([snapshot.identifier isEqual:@""] ? nil : snapshot.identifier);
   info[@"name"] = FBValueOrNull(snapshot.wdName);
@@ -61,7 +67,7 @@
   info[@"frame"] = NSStringFromCGRect(snapshot.wdFrame);
   info[@"isEnabled"] = [@([snapshot isWDEnabled]) stringValue];
   info[@"isVisible"] = [@([snapshot isWDVisible]) stringValue];
-
+    
   NSArray *childElements = snapshot.children;
   if ([childElements count]) {
     info[@"children"] = [[NSMutableArray alloc] init];
@@ -69,7 +75,42 @@
       [info[@"children"] addObject:[self dictionaryForElement:childSnapshot]];
     }
   }
+  
   return info;
+}
+
++ (NSDictionary *)dictionaryForVisibleElement:(XCElementSnapshot *)snapshot
+{
+//  NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
+  NSMutableDictionary *info = [NSMutableDictionary dictionary];
+  if ([snapshot isWDVisible]) {
+    info[@"type"] = [FBElementTypeTransformer shortStringWithElementType:snapshot.elementType];
+    info[@"rawIdentifier"] = FBValueOrNull([snapshot.identifier isEqual:@""] ? nil : snapshot.identifier);
+    info[@"name"] = FBValueOrNull(snapshot.wdName);
+    info[@"value"] = FBValueOrNull(snapshot.wdValue);
+    info[@"label"] = FBValueOrNull(snapshot.wdLabel);
+    info[@"rect"] = snapshot.wdRect;
+    info[@"frame"] = NSStringFromCGRect(snapshot.wdFrame);
+    info[@"isEnabled"] = [@([snapshot isWDEnabled]) stringValue];
+    info[@"isVisible"] = [@([snapshot isWDVisible]) stringValue];
+  
+    NSArray *childElements = snapshot.children;
+    if ([childElements count]) {
+      info[@"children"] = [[NSMutableArray alloc] init];
+
+      for (XCElementSnapshot *childSnapshot in childElements) {
+        if ([childSnapshot isWDVisible]) {
+          [info[@"children"] addObject:[self dictionaryForVisibleElement:childSnapshot]];
+        }
+      }
+    }
+  }
+  
+  if ([info isEqual:@"{}"]) {
+    return nil;
+  } else {
+    return info;
+  }
 }
 
 + (NSDictionary *)accessibilityInfoForElement:(XCElementSnapshot *)snapshot
@@ -77,8 +118,8 @@
   BOOL isAccessible = [snapshot isWDAccessible];
   BOOL isVisible = [snapshot isWDVisible];
 
-  NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
-
+//  NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
+  NSMutableDictionary *info = [NSMutableDictionary dictionary];
   if (isAccessible) {
     if (isVisible) {
       info[@"value"] = FBValueOrNull(snapshot.wdValue);

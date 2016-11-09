@@ -39,6 +39,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSDictionary *)fb_accessibilityTree;
 
+/**
+ Return application visible elements tree in form of nested dictionaries
+ */
+- (NSDictionary *)fb_visibleTree;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -55,7 +55,7 @@ class App extends React.Component {
 
   fetchTree() {
     console.log('Fetching Tree');
-    HTTP.get(TREE_ENDPOINT, (treeInfo) => {
+    HTTP.post(TREE_ENDPOINT, JSON.stringify({accessible: false, visible: true}), (treeInfo) => {
       this.setState({
         rootNode: TreeNode.buildNode(treeInfo.tree, new TreeContext()),
       });

@@ -40,7 +40,13 @@
     return FBResponseWithErrorFormat(@"There is no active application");
   }
   const BOOL accessibleTreeType = [request.arguments[@"accessible"] boolValue];
-  return FBResponseWithStatus(FBCommandStatusNoError, @{ @"tree": (accessibleTreeType ? application.fb_accessibilityTree : application.fb_tree) ?: @{} } );
+  const BOOL visibleTreeType = [request.arguments[@"visible"] boolValue];
+  if (visibleTreeType) {
+    return FBResponseWithStatus(FBCommandStatusNoError, @{ @"tree": (accessibleTreeType ? application.fb_accessibilityTree : application.fb_visibleTree) ?: @{} } );
+  } else {
+    return FBResponseWithStatus(FBCommandStatusNoError, @{ @"tree": (accessibleTreeType ? application.fb_accessibilityTree : application.fb_tree) ?: @{} } );
+  };
+
 }
 
 @end
