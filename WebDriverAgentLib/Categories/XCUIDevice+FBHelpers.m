@@ -38,45 +38,35 @@ static const NSTimeInterval FBHomeButtonCoolOffTime = 1.;
 
 - (NSData *)fb_screenshot_small:(float)scale_value
 {
-  //  return [[XCAXClient_iOS sharedClient] screenshotData];
-//  NSData *data =[[XCAXClient_iOS sharedClient] screenshotData];
-//  UIImage *imageToScale = [UIImage imageWithData:data];
-//  CGImageRef cgImage = imageToScale.CGImage;
-//  UIImage *scaledImage = [UIImage imageWithCGImage:(CGImageRef)cgImage
-//                                             scale:(imageToScale.scale * 20.0)
-//                                       orientation:(imageToScale.imageOrientation)];
-//  NSData *imageData = UIImagePNGRepresentation(scaledImage);
-//  return imageData;
-  
-    NSData *data =[[XCAXClient_iOS sharedClient] screenshotData];
-    UIImage *image = [UIImage imageWithData:data];
-    CGFloat actualHeight = image.size.height;
-    CGFloat actualWidth = image.size.width;
-    float maxHeight = 600.0;
-    float maxWidth = 800.0;
-    CGFloat imgRatio = actualWidth/actualHeight;
-    float maxRatio = maxWidth/maxHeight;
-    float compressionQuality = 1/scale_value;//50 percent compression
-    if (actualHeight > maxHeight || actualWidth > maxWidth){
-      if(imgRatio < maxRatio){ //adjust width according to maxHeight
-        imgRatio = maxHeight / actualHeight;
-        actualWidth = imgRatio * actualWidth;
-        actualHeight = maxHeight;
-      }
-      else if(imgRatio > maxRatio){ //adjust height according to maxWidth
-        imgRatio = maxWidth / actualWidth;
-        actualHeight = imgRatio * actualHeight;
-        actualWidth = maxWidth;
-      }
-      else{
-        actualHeight = maxHeight; actualWidth = maxWidth;
-      }
+  NSData *data =[[XCAXClient_iOS sharedClient] screenshotData];
+  UIImage *image = [UIImage imageWithData:data];
+  CGFloat actualHeight = image.size.height;
+  CGFloat actualWidth = image.size.width;
+  float maxHeight = 600.0;
+  float maxWidth = 800.0;
+  CGFloat imgRatio = actualWidth/actualHeight;
+  float maxRatio = maxWidth/maxHeight;
+  float compressionQuality = scale_value/100; //percentage of compression
+  if (actualHeight > maxHeight || actualWidth > maxWidth){
+    if(imgRatio < maxRatio){ //adjust width according to maxHeight
+      imgRatio = maxHeight / actualHeight;
+      actualWidth = imgRatio * actualWidth;
+      actualHeight = maxHeight;
     }
-    CGRect rect = CGRectMake(0.0, 0.0, actualWidth, actualHeight);
-    UIGraphicsBeginImageContext(rect.size);
-    [image drawInRect:rect]; UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
-    NSData *imageData = UIImageJPEGRepresentation(img, compressionQuality);
-    UIGraphicsEndImageContext();
+    else if(imgRatio > maxRatio){ //adjust height according to maxWidth
+      imgRatio = maxWidth / actualWidth;
+      actualHeight = imgRatio * actualHeight;
+      actualWidth = maxWidth;
+    }
+    else{
+      actualHeight = maxHeight; actualWidth = maxWidth;
+    }
+  }
+  CGRect rect = CGRectMake(0.0, 0.0, actualWidth, actualHeight);
+  UIGraphicsBeginImageContext(rect.size);
+  [image drawInRect:rect]; UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+  NSData *imageData = UIImageJPEGRepresentation(img, compressionQuality);
+  UIGraphicsEndImageContext();
   return imageData;
 }
 

@@ -34,3 +34,7 @@
   position:relative;
   text-align:center;
 }
+
+.screen-scale {
+  width: 25px;
+}

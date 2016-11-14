@@ -127,7 +127,11 @@ class Screen extends React.Component {
           </div>
           <div>
           Screenshot scale:
-            <input placeholder="3" value={this.state.screenshotScaleValue} onChange={this.updateScreenshotScaleValue.bind(this)}/>
+            <input className="screen-scale"
+              placeholder="50" 
+              value={this.state.screenshotScaleValue} 
+              onChange={this.updateScreenshotScaleValue.bind(this)}/>
+          %
           </div>
           <button className="screen-refresh-button"
             onClick={this.screenRefresh.bind(this)}>
