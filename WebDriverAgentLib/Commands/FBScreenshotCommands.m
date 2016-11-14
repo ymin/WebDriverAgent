@@ -32,8 +32,8 @@
 {
   NSString *scale = request.parameters[@"scale"];
   NSScanner *scanner = [NSScanner scannerWithString:scale];
-  double scale_value;
-  BOOL success = [scanner scanDouble:&scale_value];
+  float scale_value;
+  BOOL success = [scanner scanFloat:&scale_value];
   NSString *screenshot;
   if (!success) {
     screenshot = [[XCUIDevice sharedDevice].fb_screenshot base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];

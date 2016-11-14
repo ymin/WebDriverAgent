@@ -36,7 +36,7 @@ static const NSTimeInterval FBHomeButtonCoolOffTime = 1.;
   return YES;
 }
 
-- (NSData *)fb_screenshot_small:(double)scale_value
+- (NSData *)fb_screenshot_small:(float)scale_value
 {
   //  return [[XCAXClient_iOS sharedClient] screenshotData];
 //  NSData *data =[[XCAXClient_iOS sharedClient] screenshotData];
@@ -50,13 +50,13 @@ static const NSTimeInterval FBHomeButtonCoolOffTime = 1.;
   
     NSData *data =[[XCAXClient_iOS sharedClient] screenshotData];
     UIImage *image = [UIImage imageWithData:data];
-    double actualHeight = image.size.height;
-    double actualWidth = image.size.width;
+    float actualHeight = image.size.height;
+    float actualWidth = image.size.width;
     float maxHeight = 600.0;
     float maxWidth = 800.0;
-    double imgRatio = actualWidth/actualHeight;
+    float imgRatio = actualWidth/actualHeight;
     float maxRatio = maxWidth/maxHeight;
-    double compressionQuality = 1/scale_value;//50 percent compression
+    float compressionQuality = 1/scale_value;//50 percent compression
     if (actualHeight > maxHeight || actualWidth > maxWidth){
       if(imgRatio < maxRatio){ //adjust width according to maxHeight
         imgRatio = maxHeight / actualHeight;
