@@ -27,3 +27,10 @@
 .tree-node.selected {
   background-color: #D690A0;
 }
+
+.tree-fresh-button {
+  margin: 10px auto;
+  display: block;
+  position:relative;
+  text-align:center;
+}

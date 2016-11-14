@@ -17,6 +17,7 @@ require('react-treeview/react-treeview.css');
 
 const CAPTION_HEIGHT = 100;
 const CAPTION_PADDING = 20;
+const FRESH_BUTTON_PADDING = 20;
 
 class Tree extends React.Component {
   render() {
@@ -32,14 +33,32 @@ class Tree extends React.Component {
             <div className="tree-container" style={style}>
               {this.renderTree()}
             </div>
+            <div className="tree-fresh-button">
+              <button 
+                onClick={this.fetchTree.bind(this)}>
+                Refresh
+              </button>
+              <button
+                onClick={this.fetchFullTree.bind(this)}>
+                Fetch Full Tree
+              </button>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
+  fetchTree() {
+    this.props.treeRefresh();
+  }
+
+  fetchFullTree() {
+    this.props.fullTreeRefresh();
+  }
+
   maxTreeHeight() {
-    return window.innerHeight - CAPTION_HEIGHT + CAPTION_PADDING;
+    return window.innerHeight - CAPTION_HEIGHT + CAPTION_PADDING - FRESH_BUTTON_PADDING * 2;
   }
 
   styleWithMaxHeight(height) {

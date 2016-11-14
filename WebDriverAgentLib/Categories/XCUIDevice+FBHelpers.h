@@ -35,6 +35,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSData *)fb_screenshot;
 
 /**
+ Returns screenshot in smaller size
+ */
+- (NSData *)fb_screenshot_small:(double)scale_value;
+
+/**
  Returns device current wifi ip4 address
  */
 - (nullable NSString *)fb_wifiIPAddress;

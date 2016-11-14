@@ -17,7 +17,6 @@ const STATUS = 'status';
 const ORIENTATION_ENDPOINT = 'orientation';
 const SCREENSHOT_ENDPOINT = 'screenshot';
 
-
 class Screen extends React.Component {
   constructor(props) {
     super(props)
@@ -44,16 +43,27 @@ class Screen extends React.Component {
       this.setState({
         sessionId: data.sessionId
       });
+      this.getScreenWindowSize();
     })
   }
 
   getScreenWindowSize() {
     var window_size_path = 'session/'+ this.state.sessionId + '/window/size';
-    HTTP.get(window_size_path, (data) => {
-      console.log('window_size', data);
-      this.setState({
-        windowSize: data
-      })
+    HTTP.fget(window_size_path, (data) => {
+      console.log('window_size', data.value);
+      if (data.value == "Session does not exist"){
+        console.log('Session does not exist, refetch session')
+        // this.setState({
+        //   sessionId: data.sessionId
+        // })
+        this.statusCheck();
+      } else {
+        console.log('Got window size')
+        this.setState({
+          windowSize: data.value
+        })
+      }
+      
     });
   }
 
@@ -73,7 +83,7 @@ class Screen extends React.Component {
     HTTP.post(HOMESCREEN, (data) => {
       console.log(data);
     });
-    this.manuRefresh();
+    this.screenRefresh();
   }
 
   refreshAll() {
@@ -82,8 +92,18 @@ class Screen extends React.Component {
     }
   }
 
-  manuRefresh() {
-    this.props.manuRefresh();
+  screenRefresh() {
+    var sleep_fetchScreenshot = new Promise((resolve, reject) => { 
+      setTimeout(resolve, 2000, "one"); 
+    }); 
+
+    Promise.all([sleep_fetchScreenshot]).then(values => { 
+      this.props.screenRefresh();
+    }); 
+  }
+
+  updateScreenshotScaleValue(e) {
+    this.props.changeScreenshotScale(e);
   }
 
   render() {
@@ -105,11 +125,14 @@ class Screen extends React.Component {
             src={this.homeSrc()}
             style={this.homeButtonStyle()}/>
           </div>
-          <button className="home-button"
-            onClick={this.manuRefresh.bind(this)}>
+          <div>
+          Screenshot scale:
+            <input placeholder="3" value={this.state.screenshotScaleValue} onChange={this.updateScreenshotScaleValue.bind(this)}/>
+          </div>
+          <button className="screen-refresh-button"
+            onClick={this.screenRefresh.bind(this)}>
           Refresh
           </button>
-
         </div>
       </div>
     );
@@ -144,7 +167,7 @@ class Screen extends React.Component {
       console.log(data);
     });
     console.log('props', this.props); 
-    this.manuRefresh();
+    this.screenRefresh();
   }
 
   renderScreenshot() {
@@ -200,7 +223,7 @@ class Screen extends React.Component {
 Screen.propTypes = {
   highlightedNode: React.PropTypes.object,
   screenshot: React.PropTypes.object,
-  fetch: React.PropTypes.object,
+  screenshotScaleValue: React.PropTypes.object,
 };
 
 module.exports = Screen;

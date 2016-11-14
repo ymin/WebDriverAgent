@@ -8,7 +8,8 @@
  */
 
 #import "FBScreenshotCommands.h"
-
+#import "FBRoute.h"
+#import "FBRouteRequest.h"
 #import "XCUIDevice+FBHelpers.h"
 
 @implementation FBScreenshotCommands
@@ -29,7 +30,17 @@
 
 + (id<FBResponsePayload>)handleGetScreenshot:(FBRouteRequest *)request
 {
-  NSString *screenshot = [[XCUIDevice sharedDevice].fb_screenshot base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
+  NSString *scale = request.parameters[@"scale"];
+  NSScanner *scanner = [NSScanner scannerWithString:scale];
+  double scale_value;
+  BOOL success = [scanner scanDouble:&scale_value];
+  NSString *screenshot;
+  if (!success) {
+    screenshot = [[XCUIDevice sharedDevice].fb_screenshot base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
+  }
+  else {
+    screenshot = [[[XCUIDevice sharedDevice] fb_screenshot_small:scale_value] base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
+  }
   return FBResponseWithObject(screenshot);
 }
 

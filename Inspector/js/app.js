@@ -30,7 +30,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       data: null,
-      fetched: false,
+      screenshotScaleValue: 1.0,
     };
   }
 
@@ -39,14 +39,21 @@ class App extends React.Component {
     this.fetchTree();
   }
 
+  updateScreenshotScaleValue(e) {
+    console.log('scale_value', e.currentTarget.value);
+    this.setState({
+      screenshotScaleValue: e.currentTarget.value,
+    })
+  }
+
   fetchScreenshot() {
     console.log('Fetching Screenshot');
     HTTP.get(ORIENTATION_ENDPOINT, (orientation) => {
-      HTTP.get(SCREENSHOT_ENDPOINT, (base64EncodedImage) => {
+      HTTP.get(SCREENSHOT_ENDPOINT + '?scale=' + this.state.screenshotScaleValue, (base64EncodedImage) => {
         ScreenshotFactory.createScreenshot(orientation, base64EncodedImage, (screenshot) => {
           this.setState({
             screenshot: screenshot,
-            fetched: true,
+            // fetched: true,
           });
         });
       });
@@ -62,6 +69,15 @@ class App extends React.Component {
     });
   }
 
+  fetchFullTree() {
+    console.log('Fetching full Tree');
+    HTTP.post(TREE_ENDPOINT, JSON.stringify({accessible: false}), (treeInfo) => {
+      this.setState({
+        rootNode: TreeNode.buildNode(treeInfo.tree, new TreeContext()),
+      });
+    });
+  }
+
   refreshClick(){
     if (!this.state.fetched) {
       this.fetchScreenshot();
@@ -69,41 +85,19 @@ class App extends React.Component {
     }
   }
 
-  manuRefreshClick(){
-    var sleep_fetchScreenshot = new Promise((resolve, reject) => { 
-      setTimeout(resolve, 2000, "one"); 
-    }); 
-
-    Promise.all([sleep_fetchScreenshot]).then(values => { 
-      this.fetchScreenshot();
-    });
-
-    var sleep_fetchTree = new Promise((resolve, reject) => { 
-      setTimeout(resolve, 3000, "one"); 
-    }); 
-
-    Promise.all([sleep_fetchTree]).then(values => { 
-      this.fetchTree();  
-    });    
-  }
-
   render() {
     return (
       <div id="app">
         <Screen
-          onFetchedChange={(fetch) => {
-            this.setState({
-              fetched: fetch,
-            });
-          }}
-          manuRefresh={this.manuRefreshClick.bind(this)}
-          fetched={this.state.fetched}
-          onClick={this.refreshClick()}
+          screenRefresh={this.fetchScreenshot.bind(this)}
+          changeScreenshotScale={this.updateScreenshotScaleValue.bind(this)}
           data={this.state.data} 
           highlightedNode={this.state.highlightedNode}
           screenshot={this.state.screenshot}
           rootNode={this.state.rootNode} />
   			<Tree
+          treeRefresh={this.fetchTree.bind(this)}
+          fullTreeRefresh={this.fetchFullTree.bind(this)}
           onHighlightedNodeChange={(node) => {
             this.setState({
               highlightedNode: node,
