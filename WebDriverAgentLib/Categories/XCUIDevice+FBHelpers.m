@@ -50,11 +50,11 @@ static const NSTimeInterval FBHomeButtonCoolOffTime = 1.;
   
     NSData *data =[[XCAXClient_iOS sharedClient] screenshotData];
     UIImage *image = [UIImage imageWithData:data];
-    float actualHeight = image.size.height;
-    float actualWidth = image.size.width;
+    CGFloat actualHeight = image.size.height;
+    CGFloat actualWidth = image.size.width;
     float maxHeight = 600.0;
     float maxWidth = 800.0;
-    float imgRatio = actualWidth/actualHeight;
+    CGFloat imgRatio = actualWidth/actualHeight;
     float maxRatio = maxWidth/maxHeight;
     float compressionQuality = 1/scale_value;//50 percent compression
     if (actualHeight > maxHeight || actualWidth > maxWidth){
