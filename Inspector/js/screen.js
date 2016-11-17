@@ -128,7 +128,7 @@ class Screen extends React.Component {
           <div>
           Screenshot scale:
             <input className="screen-scale"
-              placeholder="50" 
+              placeholder="90" 
               value={this.state.screenshotScaleValue} 
               onChange={this.updateScreenshotScaleValue.bind(this)}/>
           %
