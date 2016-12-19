@@ -34,6 +34,7 @@
     [[FBRoute POST:@"/homescreen"].withoutSession respondWithTarget:self action:@selector(handleHomescreenCommand:)],
     [[FBRoute POST:@"/deactivateApp"] respondWithTarget:self action:@selector(handleDeactivateAppCommand:)],
     [[FBRoute POST:@"/timeouts"] respondWithTarget:self action:@selector(handleTimeouts:)],
+    [[FBRoute POST:@"/doubleTapHomescreen"].withoutSession respondWithTarget:self action:@selector(handleDoubleTapHomescreenCommand:)],
   ];
 }
 
@@ -44,6 +45,15 @@
 {
   NSError *error;
   if (![[XCUIDevice sharedDevice] fb_goToHomescreenWithError:&error]) {
+    return FBResponseWithError(error);
+  }
+  return FBResponseWithOK();
+}
+
++ (id<FBResponsePayload>)handleDoubleTapHomescreenCommand:(FBRouteRequest *)request
+{
+  NSError *error;
+  if (![[XCUIDevice sharedDevice] fb_doubleTapHomescreenWithError:&error]) {
     return FBResponseWithError(error);
   }
   return FBResponseWithOK();

@@ -13,6 +13,7 @@ import HTTP from 'js/http';
 require('css/screen.css');
 
 const HOMESCREEN = 'homescreen';
+const SWIPE = '/uiaTarget/0/dragfromtoforduration'
 const STATUS = 'status';
 const ORIENTATION_ENDPOINT = 'orientation';
 const SCREENSHOT_ENDPOINT = 'screenshot';
@@ -23,6 +24,8 @@ class Screen extends React.Component {
     this.state = {
       sessionId: {},
       windowSize: {},
+      osInfo: {},
+      unlockCode: '0000',
     };
   }
 
@@ -41,7 +44,8 @@ class Screen extends React.Component {
     HTTP.fget(STATUS, (data) => {
       console.log('sessionId', data.sessionId);
       this.setState({
-        sessionId: data.sessionId
+        sessionId: data.sessionId,
+        osInfo: data.value.os,
       });
       this.getScreenWindowSize();
     })
@@ -86,6 +90,64 @@ class Screen extends React.Component {
     this.screenRefresh();
   }
 
+  unlockSwipe(i) {
+    console.log('unlockswipe',i);
+    var screen_size = this.state.windowSize;
+    if (parseInt(this.state.osInfo.version.replace(/\./gi, '')) >= 1000){
+      this.homeClick();
+      var sleep_fetchScreenshot = new Promise((resolve, reject) => { 
+        setTimeout(resolve, 1000, "one"); 
+      }); 
+
+      Promise.all([sleep_fetchScreenshot]).then(values => { 
+        this.homeClick();
+      }); 
+    } else {
+      this.homeClick();
+      var x = screen_size.width;
+      var y = screen_size.height;
+      var swipe_path = 'session/'+ this.state.sessionId + SWIPE;
+      console.log(JSON.stringify({ fromX: 0.22 * x, toX: 0.86 * x, fromY: 0.86 * y, toY: 0.86 * y, duration: 0 }));
+      HTTP.fpost(swipe_path, JSON.stringify({ fromX: 50, toX: 0.8 * x, fromY: 0.9 * y, toY: 0.9 * y, duration: 0 }), (data) => {
+        console.log(data);
+      });
+    }
+
+    this.screenRefresh();
+    var sleep_fetchScreenshot = new Promise((resolve, reject) => { 
+        setTimeout(resolve, 3000, "one"); 
+    }); 
+    Promise.all([sleep_fetchScreenshot]).then(values => { 
+        this.unlockWithPasscode();
+    }); 
+    
+  }
+
+
+  unlockWithPasscode() {
+    var passcode = this.state.unlockCode;
+    var find_element_path = 'session/'+ this.state.sessionId + '/element';
+    for(var i = 0; i < passcode.length; i++){
+      console.log('passcode', passcode[i]);
+      HTTP.fpost(find_element_path, JSON.stringify({ using: 'link text', value: 'label=' + passcode[i] }), (data) => {
+        console.log(data);
+        var elementId = data.value.ELEMENT;
+        var click_element_path = find_element_path + '/' + elementId + '/click';
+        HTTP.fpost(click_element_path, (data) => {
+          console.log(data);
+        });
+      });
+    }
+
+    var sleep_fetchScreenshot = new Promise((resolve, reject) => { 
+        setTimeout(resolve, 5000, "one"); 
+    }); 
+    Promise.all([sleep_fetchScreenshot]).then(values => { 
+      this.screenRefresh();
+    }); 
+    
+  }
+
   refreshAll() {
     if (this.props.onFetchedChange != false) {
       this.props.onFetchedChange(false);
@@ -104,6 +166,12 @@ class Screen extends React.Component {
 
   updateScreenshotScaleValue(e) {
     this.props.changeScreenshotScale(e);
+  }
+
+  updateUnlockCode(e) {
+    this.setState({
+      unlockCode: e.currentTarget.value,
+    })
   }
 
   render() {
@@ -137,6 +205,17 @@ class Screen extends React.Component {
             onClick={this.screenRefresh.bind(this)}>
           Refresh
           </button>
+          <div>
+          Passcode:
+            <input className="unlock-code"
+              placeholder="0000" 
+              value={this.state.unlockCode}
+              onChange={this.updateUnlockCode.bind(this)}/>
+            <button className="unlock-swipe-button"
+              onClick={this.unlockSwipe.bind(this)}>
+            Unlock Swipe
+            </button>
+          </div>
         </div>
       </div>
     );

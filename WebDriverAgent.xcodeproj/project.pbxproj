@@ -260,6 +260,13 @@
 			remoteGlobalIDString = EE9B75D31CF7956C00275851;
 			remoteInfo = IntegrationApp;
 		};
+		1920AFBF1DDE183900B08082 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 91F9DAE11B99DBC2001349B2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EE9B75D31CF7956C00275851;
+			remoteInfo = IntegrationApp;
+		};
 		AD8D96F01D3C12960061268E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 91F9DAE11B99DBC2001349B2 /* Project object */;
@@ -1321,6 +1328,7 @@
 			);
 			dependencies = (
 				AD8D96F11D3C12960061268E /* PBXTargetDependency */,
+				1920AFC01DDE183900B08082 /* PBXTargetDependency */,
 			);
 			name = UnitTests;
 			productName = WebDriverAgentCoreTests;
@@ -1403,6 +1411,7 @@
 					EE836C011C0F118600D87246 = {
 						CreatedOnToolsVersion = 7.1.1;
 						DevelopmentTeam = H38Z759243;
+						TestTargetID = EE9B75D31CF7956C00275851;
 					};
 					EE9B75D31CF7956C00275851 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -1639,6 +1648,11 @@
 			isa = PBXTargetDependency;
 			target = EE9B75D31CF7956C00275851 /* IntegrationApp */;
 			targetProxy = 19102FC61DD903220025D65C /* PBXContainerItemProxy */;
+		};
+		1920AFC01DDE183900B08082 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EE9B75D31CF7956C00275851 /* IntegrationApp */;
+			targetProxy = 1920AFBF1DDE183900B08082 /* PBXContainerItemProxy */;
 		};
 		AD8D96F11D3C12960061268E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1878,6 +1892,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.facebook.WebDriverAgentCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IntegrationApp.app/IntegrationApp";
 			};
 			name = Debug;
 		};
@@ -1894,6 +1909,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.facebook.WebDriverAgentCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IntegrationApp.app/IntegrationApp";
 			};
 			name = Release;
 		};
