@@ -13,7 +13,7 @@ import HTTP from 'js/http';
 require('css/screen.css');
 
 const HOMESCREEN = 'homescreen';
-const SWIPE = '/uiaTarget/0/dragfromtoforduration'
+const SWIPE = '/wda/dragfromtoforduration'
 const STATUS = 'status';
 const ORIENTATION_ENDPOINT = 'orientation';
 const SCREENSHOT_ENDPOINT = 'screenshot';
@@ -245,7 +245,7 @@ class Screen extends React.Component {
     var realY = i.nativeEvent.offsetY / screenshot.height * screen_size.height;
     console.log(realX);
     console.log(realY);
-    var tap_on_path = 'session/' + this.state.sessionId + '/tap/0';
+    var tap_on_path = 'session/' + this.state.sessionId + '/wda/tap';
     HTTP.fpost(tap_on_path, JSON.stringify({x: realX, y: realY}), (data) => {
       console.log(data);
     });
