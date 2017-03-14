@@ -20,7 +20,7 @@
       return FBResponseFileWithPath([[self class] inspectorHTMLFilePath]);
     }],
     [[FBRoute GET:@"/inspector.js"].withoutSession respondWithBlock: ^ id<FBResponsePayload> (FBRouteRequest *request) {
-        return FBResponseFileWithPath([[self class] inspectorJSFilePath]);
+      return FBResponseFileWithPath([[self class] inspectorJSFilePath]);
     }],
     [[FBRoute GET:@"/image/home_button.png"].withoutSession respondWithBlock: ^ id<FBResponsePayload> (FBRouteRequest *request) {
         return FBResponseFileWithPath([[self class] inspectorHomeButtonImageFilePath]);

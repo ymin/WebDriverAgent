@@ -18,10 +18,10 @@ import TreeContext from 'js/tree_context';
 import Inspector from 'js/inspector';
 
 
-require('css/app.css')
+require('css/app.css');
 
 const SCREENSHOT_ENDPOINT = 'screenshot';
-const TREE_ENDPOINT = 'source';
+const TREE_ENDPOINT = 'source?format=json';
 const ORIENTATION_ENDPOINT = 'orientation';
 
 
@@ -73,7 +73,7 @@ class App extends React.Component {
     console.log('Fetching full Tree');
     HTTP.post(TREE_ENDPOINT, JSON.stringify({accessible: false}), (treeInfo) => {
       this.setState({
-        rootNode: TreeNode.buildNode(treeInfo.tree, new TreeContext()),
+        rootNode: TreeNode.buildNode(treeInfo, new TreeContext()),
       });
     });
   }
@@ -110,8 +110,8 @@ class App extends React.Component {
           }}
           rootNode={this.state.rootNode}
           selectedNode={this.state.selectedNode} />
-  			<Inspector selectedNode={this.state.selectedNode} />
-  		</div>
+        <Inspector selectedNode={this.state.selectedNode} />
+      </div>
     );
   }
 }

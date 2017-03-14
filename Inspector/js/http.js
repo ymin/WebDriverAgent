@@ -12,7 +12,7 @@ import Ajax from 'simple-ajax';
 class Http { 
   
   static get(path, callback) {
-    let ajax = new Ajax({
+    const ajax = new Ajax({
       url: path,
       method: 'GET'
     });
