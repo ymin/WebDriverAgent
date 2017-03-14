@@ -49,3 +49,4 @@ Modules/module.modulemap
 
 # test run
 *.trace
+.xcconfig
