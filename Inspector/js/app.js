@@ -7,7 +7,6 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-import React from 'react';
 
 import HTTP from 'js/http';
 import Screen from 'js/screen';
@@ -17,12 +16,15 @@ import TreeNode from 'js/tree_node';
 import TreeContext from 'js/tree_context';
 import Inspector from 'js/inspector';
 
+var React = require('react'); /* importing react */
+var ReactDOM = require('react-dom'); /* importing react-dom */
 
 require('css/app.css');
 
 const SCREENSHOT_ENDPOINT = 'screenshot';
 const TREE_ENDPOINT = 'source?format=json';
 const ORIENTATION_ENDPOINT = 'orientation';
+const ACCESSIBLE_TREE_ENDPOINT = 'wda/accessibleSource'
 
 
 class App extends React.Component {
@@ -62,16 +64,16 @@ class App extends React.Component {
 
   fetchTree() {
     console.log('Fetching Tree');
-    HTTP.post(TREE_ENDPOINT, JSON.stringify({accessible: false, visible: true}), (treeInfo) => {
+    HTTP.get(TREE_ENDPOINT, (treeInfo) => {
       this.setState({
-        rootNode: TreeNode.buildNode(treeInfo.tree, new TreeContext()),
+        rootNode: TreeNode.buildNode(treeInfo, new TreeContext()),
       });
     });
   }
 
   fetchFullTree() {
-    console.log('Fetching full Tree');
-    HTTP.post(TREE_ENDPOINT, JSON.stringify({accessible: false}), (treeInfo) => {
+    console.log('Fetching accessible Tree');
+    HTTP.get(ACCESSIBLE_TREE_ENDPOINT, (treeInfo) => {
       this.setState({
         rootNode: TreeNode.buildNode(treeInfo, new TreeContext()),
       });
@@ -116,4 +118,4 @@ class App extends React.Component {
   }
 }
 
-React.render(<App />, document.body);
+ReactDOM.render(<App />, document.body);

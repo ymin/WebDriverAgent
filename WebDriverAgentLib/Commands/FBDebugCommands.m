@@ -56,7 +56,7 @@
   if (!sourceType || [sourceType caseInsensitiveCompare:@"xml"] == NSOrderedSame) {
     result = [FBXPath xmlStringWithSnapshot:application.lastSnapshot];
   } else if ([sourceType caseInsensitiveCompare:@"json"] == NSOrderedSame) {
-    result = application.fb_tree;
+    result = application.fb_visibleTree;
   } else {
     return FBResponseWithStatus(
       FBCommandStatusUnsupported,
