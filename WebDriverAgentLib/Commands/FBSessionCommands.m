@@ -10,6 +10,7 @@
 #import "FBSessionCommands.h"
 
 #import "FBApplication.h"
+#import "FBConfiguration.h"
 #import "FBRouteRequest.h"
 #import "FBSession.h"
 #import "FBApplication.h"
@@ -52,9 +53,12 @@
       [NSString stringWithFormat:@"%@ is not a valid URL", url]
     );
   }
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
   if (![[UIApplication sharedApplication] openURL:url]) {
     return FBResponseWithErrorFormat(@"Failed to open %@", url);
   }
+  #pragma clang diagnostic pop
   return FBResponseWithOK();
 }
 
@@ -66,6 +70,11 @@
   if (!bundleID) {
     return FBResponseWithErrorFormat(@"'bundleId' desired capability not provided");
   }
+  [FBConfiguration setShouldUseTestManagerForVisibilityDetection:[requirements[@"shouldUseTestManagerForVisibilityDetection"] boolValue]];
+  if (requirements[@"maxTypingFrequency"]) {
+    [FBConfiguration setMaxTypingFrequency:[requirements[@"maxTypingFrequency"] integerValue]];
+  }
+
   FBApplication *app = [[FBApplication alloc] initPrivateWithPath:appPath bundleID:bundleID];
   app.fb_shouldWaitForQuiescence = [requirements[@"shouldWaitForQuiescence"] boolValue];
   app.launchArguments = (NSArray<NSString *> *)requirements[@"arguments"] ?: @[];

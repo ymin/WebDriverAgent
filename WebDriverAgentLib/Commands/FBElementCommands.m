@@ -23,6 +23,7 @@
 #import "XCUICoordinate.h"
 #import "XCUIDevice.h"
 #import "XCUIElement+FBIsVisible.h"
+#import "XCUIElement+FBPickerWheel.h"
 #import "XCUIElement+FBScrolling.h"
 #import "XCUIElement+FBTap.h"
 #import "XCUIElement+FBTyping.h"
@@ -67,6 +68,7 @@
     [[FBRoute POST:@"/wda/touchAndHold"] respondWithTarget:self action:@selector(handleTouchAndHoldCoordinate:)],
     [[FBRoute POST:@"/wda/doubleTap"] respondWithTarget:self action:@selector(handleDoubleTapCoordinate:)],
     [[FBRoute POST:@"/wda/keys"] respondWithTarget:self action:@selector(handleKeys:)],
+    [[FBRoute POST:@"/wda/pickerwheel/:uuid/select"] respondWithTarget:self action:@selector(handleWheelSelect:)]
   ];
 }
 
@@ -369,6 +371,37 @@
   });
 }
 
+static const CGFloat DEFAULT_OFFSET = (CGFloat)0.2;
+
++ (id<FBResponsePayload>)handleWheelSelect:(FBRouteRequest *)request
+{
+  FBElementCache *elementCache = request.session.elementCache;
+  XCUIElement *element = [elementCache elementForUUID:request.parameters[@"uuid"]];
+  if (element.elementType != XCUIElementTypePickerWheel) {
+    return FBResponseWithErrorFormat(@"The element is expected to be a valid Picker Wheel control. '%@' was given instead", element.wdType);
+  }
+  NSString* order = [request.arguments[@"order"] lowercaseString];
+  CGFloat offset = DEFAULT_OFFSET;
+  if (request.arguments[@"offset"]) {
+    offset = (CGFloat)[request.arguments[@"offset"] doubleValue];
+    if (offset <= 0.0 || offset > 0.5) {
+      return FBResponseWithErrorFormat(@"'offset' value is expected to be in range (0.0, 0.5]. '%@' was given instead", request.arguments[@"offset"]);
+    }
+  }
+  BOOL isSuccessful = false;
+  NSError *error;
+  if ([order isEqualToString:@"next"]) {
+    isSuccessful = [element fb_selectNextOptionWithOffset:offset error:&error];
+  } else if ([order isEqualToString:@"previous"]) {
+    isSuccessful = [element fb_selectPreviousOptionWithOffset:offset error:&error];
+  } else {
+    return FBResponseWithErrorFormat(@"Only 'previous' and 'next' order values are supported. '%@' was given instead", request.arguments[@"order"]);
+  }
+  if (!isSuccessful) {
+    return FBResponseWithError(error);
+  }
+  return FBResponseWithOK();
+}
 
 #pragma mark - Helpers
 

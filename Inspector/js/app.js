@@ -28,94 +28,111 @@ const ACCESSIBLE_TREE_ENDPOINT = 'wda/accessibleSource'
 
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: null,
-      screenshotScaleValue: 90.0,
-    };
-  }
-
-  componentDidMount() {
-    this.fetchScreenshot();
-    this.fetchTree();
-  }
-
-  updateScreenshotScaleValue(e) {
-    console.log('scale_value', e.currentTarget.value);
-    this.setState({
-      screenshotScaleValue: e.currentTarget.value,
-    })
-  }
-
-  fetchScreenshot() {
-    console.log('Fetching Screenshot');
-    HTTP.get(ORIENTATION_ENDPOINT, (orientation) => {
-      HTTP.get(SCREENSHOT_ENDPOINT + '?scale=' + this.state.screenshotScaleValue, (base64EncodedImage) => {
-        ScreenshotFactory.createScreenshot(orientation, base64EncodedImage, (screenshot) => {
-          this.setState({
-            screenshot: screenshot,
-            // fetched: true,
-          });
-        });
-      });
-    });
-  }
-
-  fetchTree() {
-    console.log('Fetching Tree');
-    HTTP.get(TREE_ENDPOINT, (treeInfo) => {
-      this.setState({
-        rootNode: TreeNode.buildNode(treeInfo, new TreeContext()),
-      });
-    });
-  }
-
-  fetchFullTree() {
-    console.log('Fetching accessible Tree');
-    HTTP.get(ACCESSIBLE_TREE_ENDPOINT, (treeInfo) => {
-      this.setState({
-        rootNode: TreeNode.buildNode(treeInfo, new TreeContext()),
-      });
-    });
-  }
-
-  refreshClick(){
-    if (!this.state.fetched) {
-      this.fetchScreenshot();
-      this.fetchTree();  
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: null,
+            screenshotScaleValue: 90.0,
+        };
     }
-  }
 
-  render() {
-    return (
-      <div id="app">
-        <Screen
-          screenRefresh={this.fetchScreenshot.bind(this)}
-          changeScreenshotScale={this.updateScreenshotScaleValue.bind(this)}
-          data={this.state.data} 
-          highlightedNode={this.state.highlightedNode}
-          screenshot={this.state.screenshot}
-          rootNode={this.state.rootNode} />
-  			<Tree
-          treeRefresh={this.fetchTree.bind(this)}
-          fullTreeRefresh={this.fetchFullTree.bind(this)}
-          onHighlightedNodeChange={(node) => {
-            this.setState({
-              highlightedNode: node,
+    refreshApp() {
+        this.fetchScreenshot();
+        this.fetchTree();
+    }
+
+
+    componentDidMount() {
+        this.refreshApp();
+    }
+
+    updateScreenshotScaleValue(e) {
+        console.log('scale_value', e.currentTarget.value);
+        this.setState({
+            screenshotScaleValue: e.currentTarget.value,
+        })
+    }
+
+    fetchScreenshot() {
+        console.log('Fetching Screenshot');
+        HTTP.get(ORIENTATION_ENDPOINT, (orientation) => {
+            orientation = orientation.value;
+            HTTP.get(SCREENSHOT_ENDPOINT + '?scale=' + this.state.screenshotScaleValue, (base64EncodedImage) => {
+
+                base64EncodedImage = base64EncodedImage.value;
+                ScreenshotFactory.createScreenshot(orientation, base64EncodedImage, (screenshot) => {
+                    this.setState({
+                        screenshot: screenshot,
+                        // fetched: true,
+                    });
+                });
             });
-          }}
-          onSelectedNodeChange={(node) => {
+        });
+    }
+
+    fetchTree() {
+        console.log('Fetching Tree');
+        HTTP.get(TREE_ENDPOINT, (treeInfo) => {
+            treeInfo = treeInfo.value;
             this.setState({
-              selectedNode: node,
+                rootNode: TreeNode.buildNode(treeInfo, new TreeContext()),
             });
-          }}
-          rootNode={this.state.rootNode}
-          selectedNode={this.state.selectedNode} />
-        <Inspector selectedNode={this.state.selectedNode} />
-      </div>
-    );
-  }
+        });
+    }
+
+    fetchFullTree() {
+        console.log('Fetching accessible Tree');
+        HTTP.get(ACCESSIBLE_TREE_ENDPOINT, (treeInfo) => {
+            this.setState({
+                rootNode: TreeNode.buildNode(treeInfo, new TreeContext()),
+            });
+        });
+    }
+
+    refreshClick() {
+        if (!this.state.fetched) {
+            this.fetchScreenshot();
+            this.fetchTree();
+        }
+    }
+
+    render() {
+        return (
+            <div id = "app">
+            <Screen screenRefresh = { this.fetchScreenshot.bind(this) }
+                changeScreenshotScale = { this.updateScreenshotScaleValue.bind(this) }
+                data = { this.state.data }
+                highlightedNode = { this.state.highlightedNode }
+                screenshot = { this.state.screenshot }
+                rootNode = { this.state.rootNode }/>
+            <Tree treeRefresh = { this.fetchTree.bind(this) }
+                fullTreeRefresh = { this.fetchFullTree.bind(this) }
+                rootNode = { this.state.rootNode }
+                refreshApp = {
+                    () => { this.refreshApp(); }/>
+            <Tree onHighlightedNodeChange = {
+                (node) => {
+                    this.setState({
+                        highlightedNode: node,
+                    });
+                }
+            }
+            onSelectedNodeChange = {
+                (node) => {
+                    this.setState({
+                        selectedNode: node,
+                    });
+                }
+            }
+            rootNode = { this.state.rootNode }
+            selectedNode = { this.state.selectedNode }/>
+            <Inspector selectedNode = { this.state.selectedNode }
+            refreshApp = {
+                () => { this.refreshApp(); }
+            }/>
+            </div >
+        );
+    }
 }
 
-ReactDOM.render(<App />, document.body);
+ReactDOM.render( <App/> , document.body);

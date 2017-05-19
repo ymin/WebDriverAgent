@@ -13,6 +13,7 @@
 #import "FBMacros.h"
 #import "XCElementSnapshot.h"
 #import "XCUIElement+FBUtilities.h"
+#import "XCUIElement+FBWebDriverAttributes.h"
 
 NSString *const FBClassChainQueryParseException = @"FBClassChainQueryParseException";
 
@@ -20,42 +21,25 @@ NSString *const FBClassChainQueryParseException = @"FBClassChainQueryParseExcept
 
 - (NSArray <XCUIElement *> *)fb_matchingElementsWithSnapshots:(NSArray<XCElementSnapshot *> *)snapshots usingChain:(FBClassChain)chain
 {
-  XCUIElementQuery *elementsQuery = [self childrenMatchingType:[chain firstObject].type];
+  XCUIElementQuery *elementsQuery;
+  if (nil == [chain firstObject].predicate) {
+    elementsQuery = [self childrenMatchingType:[chain firstObject].type];
+  } else {
+    elementsQuery = [[self childrenMatchingType:[chain firstObject].type] matchingPredicate:(NSPredicate  * _Nonnull)[chain firstObject].predicate];
+  }
   for (NSUInteger level = 1; level < chain.count; ++level) {
-    elementsQuery = [elementsQuery childrenMatchingType:[chain objectAtIndex:level].type];
-  }
-  NSMutableArray *candidateElements = [NSMutableArray arrayWithArray:elementsQuery.allElementsBoundByIndex];
-  if ([chain lastObject].position < 0 && candidateElements.count > 1) {
-    // reverse candidates list if the expected element position is negative
-    // to speed up the lookup
-    candidateElements = [[candidateElements reverseObjectEnumerator] allObjects].mutableCopy;
-  }
-  NSMutableArray *result = [NSMutableArray array];
-  NSMutableArray *unmatchedSnapshots = snapshots.mutableCopy;
-  NSUInteger candidateElementIdx = 0;
-  while (candidateElementIdx < candidateElements.count) {
-    XCUIElement *candidateElement = [candidateElements objectAtIndex:candidateElementIdx];
-    NSUInteger snapshotIdx = 0;
-    BOOL isMatchFound = NO;
-    while (snapshotIdx < unmatchedSnapshots.count) {
-      if ([candidateElement.fb_lastSnapshot _matchesElement:[unmatchedSnapshots objectAtIndex:snapshotIdx]]) {
-        [result addObject:candidateElement];
-        [unmatchedSnapshots removeObjectAtIndex:snapshotIdx];
-        isMatchFound = YES;
-        break;
-      }
-      ++snapshotIdx;
-    }
-    if (0 == unmatchedSnapshots.count) {
-      break;
-    }
-    if (isMatchFound) {
-      [candidateElements removeObjectAtIndex:candidateElementIdx];
+    FBClassChainElement *currentChainItem = [chain objectAtIndex:level];
+    if (nil == currentChainItem.predicate) {
+      elementsQuery = [elementsQuery childrenMatchingType:currentChainItem.type];
     } else {
-      ++candidateElementIdx;
+      elementsQuery = [[elementsQuery childrenMatchingType:currentChainItem.type] matchingPredicate:(NSPredicate  * _Nonnull)currentChainItem.predicate];
     }
   }
-  return result.copy;
+  NSArray<XCUIElement<FBElement>*> *candidateElements = elementsQuery.allElementsBoundByIndex;
+  NSSet *byTypes = [FBElementUtils uniqueElementTypesWithElements:candidateElements];
+  NSDictionary *categorizedDescendants = [self fb_categorizeDescendants:byTypes];
+  BOOL useReversedOrder = [chain lastObject].position < 0 && candidateElements.count > 1;
+  return [self.class fb_filterElements:categorizedDescendants matchingSnapshots:snapshots useReversedOrder:useReversedOrder];
 }
 
 - (NSArray<XCUIElement *> *)fb_descendantsMatchingClassChain:(NSString *)classChainQuery shouldReturnAfterFirstMatch:(BOOL)shouldReturnAfterFirstMatch
@@ -78,23 +62,26 @@ NSString *const FBClassChainQueryParseException = @"FBClassChainQueryParseExcept
 
 + (NSArray<XCElementSnapshot *> *)fb_matchingChildrenWithSnapshot:(XCElementSnapshot *)root forChainElement:(FBClassChainElement *)chainElement
 {
-  NSArray *childrenMatchingByType = root.children;
-  if (0 == childrenMatchingByType.count) {
+  NSArray *childrenMatches = root.children;
+  if (0 == childrenMatches.count) {
     return @[];
   }
   if (XCUIElementTypeAny != chainElement.type) {
-    childrenMatchingByType = [childrenMatchingByType filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"%K == %@", FBStringify(XCUIElement, elementType), @(chainElement.type)]];
+    childrenMatches = [childrenMatches filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"%K == %@", FBStringify(XCUIElement, elementType), @(chainElement.type)]];
+  }
+  if (nil != chainElement.predicate) {
+    childrenMatches = [childrenMatches filteredArrayUsingPredicate:(NSPredicate  * _Nonnull)chainElement.predicate];
   }
   NSMutableArray *result = [NSMutableArray array];
   if (0 == chainElement.position) {
-    [result addObjectsFromArray:childrenMatchingByType];
+    [result addObjectsFromArray:childrenMatches];
   } else if (chainElement.position > 0) {
-    if ((NSUInteger)chainElement.position <= childrenMatchingByType.count) {
-      [result addObject:[childrenMatchingByType objectAtIndex:chainElement.position - 1]];
+    if ((NSUInteger)chainElement.position <= childrenMatches.count) {
+      [result addObject:[childrenMatches objectAtIndex:chainElement.position - 1]];
     }
   } else {
-    if ((NSUInteger)labs(chainElement.position) <= childrenMatchingByType.count) {
-      [result addObject:[childrenMatchingByType objectAtIndex:childrenMatchingByType.count + chainElement.position]];
+    if ((NSUInteger)labs(chainElement.position) <= childrenMatches.count) {
+      [result addObject:[childrenMatches objectAtIndex:childrenMatches.count + chainElement.position]];
     }
   }
   return result.copy;

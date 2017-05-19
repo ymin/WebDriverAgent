@@ -16,6 +16,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface FBConfiguration : NSObject
 
+/*! If set to YES will ask TestManagerDaemon for element visibility */
++ (void)setShouldUseTestManagerForVisibilityDetection:(BOOL)value;
++ (BOOL)shouldUseTestManagerForVisibilityDetection;
+
+/* The maximum typing frequency for all typing activities */
++ (void)setMaxTypingFrequency:(NSUInteger)value;
++ (NSUInteger)maxTypingFrequency;
+
 /**
  Switch for enabling/disabling reporting fake collection view cells by Accessibility framework.
  If set to YES it will report also invisible cells.
@@ -26,11 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
  The range of ports that the HTTP Server should attempt to bind on launch
  */
 + (NSRange)bindingPortRange;
-
-/**
- YES if should listen on USB. NO otherwise.
- */
-+ (BOOL)shouldListenOnUSB;
 
 /**
  YES if verbose logging is enabled. NO otherwise.

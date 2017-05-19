@@ -7,8 +7,13 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import HTTP from 'js/http';
+
+import HTTP from 'js/http';
+
+var Button = require('react-button');
 
 require('css/screen.css');
 
@@ -180,6 +185,14 @@ class Screen extends React.Component {
         <div className="section-caption">
           Screen
         </div>
+        <div>
+          <Button onClick={(ev) => {this.home(ev); }} >
+            Home
+          </Button>
+          <Button onClick={this.props.refreshApp} >
+            Refresh
+          </Button>
+        </div>
         <div className="section-content-container">
           <div className="screen-screenshot-container"
             style={this.styleWithScreenSize()}>
@@ -233,6 +246,7 @@ class Screen extends React.Component {
     return this.props.screenshot ? this.props.screenshot : {};
   }
 
+<<<<<<< HEAD
   screenClick(i) {
    
     var screenshot = this.styleWithScreenSize();
@@ -253,6 +267,16 @@ class Screen extends React.Component {
     this.screenRefresh();
   }
 
+  home(ev) {
+        HTTP.post(
+            '/wda/homescreen',
+            JSON.stringify({}),
+            (result) => {
+            this.props.refreshApp();
+        },
+        );
+  }
+
   renderScreenshot() {
     return ( 
       <div onClick={this.screenClick.bind(this)} >
@@ -260,9 +284,54 @@ class Screen extends React.Component {
           className="screen-screenshot"
           src={this.screenshot().source}
           style={this.styleWithScreenSize()} />
-      </div>
-    );
+      </div> );
   }
+
+  // onScreenShotClick(ev) {
+  //   var x = ev.pageX - document.getElementById('screenshot').offsetLeft;
+  //   var y = ev.pageY - document.getElementById('screenshot').offsetTop;
+  //
+  //   var screenshot = this.screenshot();
+  //
+  //   var pxPtScale = screenshot.width / this.props.rootNode.rect.size.width;
+  //
+  //   x = x / screenshot.scale;
+  //   y = y / screenshot.scale;
+  //
+  //   x = x / pxPtScale;
+  //   y = y / pxPtScale;
+  //
+  //   HTTP.get(
+  //     'status', (status_result) => {
+  //       var session_id = status_result.sessionId;
+  //       HTTP.post(
+  //         'session/' + session_id + '/wda/tap/0',
+  //         JSON.stringify({
+  //           'x': x,
+  //           'y': y,
+  //         }),
+  //         (tap_result) => {
+  //           this.props.refreshApp();
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
+
+  //
+  // renderScreenshot() {
+  //   return (
+  //     <img
+  //       className="screen-screenshot"
+  //       src={this.screenshot().source}
+  //       style={this.styleWithScreenSize()}
+  //       onClick={(ev) => this.onScreenShotClick(ev)}
+  //       id="screenshot"
+  //     />
+  //   );
+  // }
+
 
   renderHighlightedNode() {
     if (this.props.highlightedNode == null) {

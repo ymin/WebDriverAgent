@@ -18,10 +18,11 @@ class Http {
     });
     ajax.on('success', event => {
       var response = JSON.parse(event.target.responseText);
-      callback(response.value);
+      callback(response);
     });
     ajax.send();
   }
+
 
   static post(path, post_data, callback) {
     let ajax = new Ajax({
