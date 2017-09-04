@@ -25,7 +25,7 @@ static NSString *const DeviceLanguageEndMarker = @"<-DeviceLanguage";
 static NSString *const DeviceLocaleBeginMarker = @"DeviceLocale->";
 static NSString *const DeviceLocaleEndMarker = @"<-DeviceLocale";
 
-@interface UITestingUITests : FBFailureProofTestCase
+@interface UITestingUITests : FBFailureProofTestCase <FBWebServerDelegate>
 @end
 
 @implementation UITestingUITests
@@ -34,6 +34,7 @@ static NSString *const DeviceLocaleEndMarker = @"<-DeviceLocale";
 + (void)setUp
 {
   [FBDebugLogDelegateDecorator decorateXCTestLogger];
+  [FBConfiguration disableRemoteQueryEvaluation];
   [super setUp];
 }
 
@@ -62,8 +63,16 @@ static NSString *const DeviceLocaleEndMarker = @"<-DeviceLocale";
  */
 - (void)testRunner
 {
-  [FBConfiguration shouldShowFakeCollectionViewCells:YES];
-  [[FBWebServer new] startServing];
+  FBWebServer *webServer = [[FBWebServer alloc] init];
+  webServer.delegate = self;
+  [webServer startServing];
+}
+
+#pragma mark - FBWebServerDelegate
+
+- (void)webServerDidRequestShutdown:(FBWebServer *)webServer
+{
+  [webServer stopServing];
 }
 
 @end

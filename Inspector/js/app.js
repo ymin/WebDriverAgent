@@ -8,6 +8,9 @@
  */
 
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import HTTP from 'js/http';
 import Screen from 'js/screen';
 import ScreenshotFactory from 'js/screenshot_factory';
@@ -135,4 +138,5 @@ class App extends React.Component {
     }
 }
 
-ReactDOM.render( <App/> , document.body);
+ReactDOM.render(<App />, document.body);
+

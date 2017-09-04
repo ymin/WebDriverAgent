@@ -11,6 +11,7 @@
 
 #import "FBApplication.h"
 #import "FBKeyboard.h"
+#import "FBPredicate.h"
 #import "FBRoute.h"
 #import "FBRouteRequest.h"
 #import "FBRunLoopSpinner.h"
@@ -20,6 +21,7 @@
 #import "FBApplication.h"
 #import "FBMacros.h"
 #import "FBMathUtils.h"
+#import "NSPredicate+FBFormat.h"
 #import "XCUICoordinate.h"
 #import "XCUIDevice.h"
 #import "XCUIElement+FBIsVisible.h"
@@ -243,29 +245,36 @@
   // what ios-driver did and sadly, we must copy them.
   NSString *const name = request.arguments[@"name"];
   if (name) {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", FBStringify(XCUIElement, wdName), name];
-    XCUIElement *childElement = [[[[element descendantsMatchingType:XCUIElementTypeAny] matchingPredicate:predicate] allElementsBoundByIndex] lastObject];
+    XCUIElement *childElement = [[[[element descendantsMatchingType:XCUIElementTypeAny] matchingIdentifier:name] allElementsBoundByIndex] lastObject];
+    if (!childElement) {
+      return FBResponseWithErrorFormat(@"'%@' identifier didn't match any elements", name);
+    }
     return [self.class handleScrollElementToVisible:childElement withRequest:request];
   }
 
   NSString *const direction = request.arguments[@"direction"];
   if (direction) {
+    NSString *const distanceString = request.arguments[@"distance"] ?: @"1.0";
+    CGFloat distance = (CGFloat)distanceString.doubleValue;
     if ([direction isEqualToString:@"up"]) {
-      [element fb_scrollUp];
+      [element fb_scrollUpByNormalizedDistance:distance];
     } else if ([direction isEqualToString:@"down"]) {
-      [element fb_scrollDown];
+      [element fb_scrollDownByNormalizedDistance:distance];
     } else if ([direction isEqualToString:@"left"]) {
-      [element fb_scrollLeft];
+      [element fb_scrollLeftByNormalizedDistance:distance];
     } else if ([direction isEqualToString:@"right"]) {
-      [element fb_scrollRight];
+      [element fb_scrollRightByNormalizedDistance:distance];
     }
     return FBResponseWithOK();
   }
 
   NSString *const predicateString = request.arguments[@"predicateString"];
   if (predicateString) {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateString];
-    XCUIElement *childElement = [[[[element descendantsMatchingType:XCUIElementTypeAny] matchingPredicate:predicate] allElementsBoundByIndex] lastObject];
+    NSPredicate *formattedPredicate = [NSPredicate fb_formatSearchPredicate:[FBPredicate predicateWithFormat:predicateString]];
+    XCUIElement *childElement = [[[[element descendantsMatchingType:XCUIElementTypeAny] matchingPredicate:formattedPredicate] allElementsBoundByIndex] lastObject];
+    if (!childElement) {
+      return FBResponseWithErrorFormat(@"'%@' predicate didn't match any elements", predicateString);
+    }
     return [self.class handleScrollElementToVisible:childElement withRequest:request];
   }
 

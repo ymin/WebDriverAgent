@@ -22,6 +22,7 @@
 
 - (void)testSpringBoardIcons
 {
+  [self launchApplication];
   [self goToSpringBoardFirstPage];
 
   // Check Icons on first screen
@@ -29,7 +30,6 @@
   XCTAssertTrue(self.springboard.icons[@"Reminders"].fb_isVisible);
 
   // Check Icons on second screen screen
-  XCTAssertFalse(self.springboard.icons[@"iCloud Drive"].fb_isVisible);
   XCTAssertFalse(self.springboard.icons[@"IntegrationApp"].fb_isVisible);
 }
 
@@ -38,6 +38,7 @@
   if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
     return;
   }
+  [self launchApplication];
   [self goToSpringBoardExtras];
   XCTAssertFalse(self.springboard.icons[@"Extras"].otherElements[@"Contacts"].fb_isVisible);
 }
@@ -47,6 +48,7 @@
   if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
     return;
   }
+  [self launchApplication];
   [self goToSpringBoardExtras];
   [self.springboard.icons[@"Extras"] tap];
   FBAssertWaitTillBecomesTrue(self.springboard.icons[@"Contacts"].fb_isVisible);
@@ -58,14 +60,15 @@
 
 - (void)testIconsFromSearchDashboard
 {
+  [self launchApplication];
   [self goToSpringBoardDashboard];
   XCTAssertFalse(self.springboard.icons[@"Reminders"].fb_isVisible);
-  XCTAssertFalse(self.springboard.icons[@"iCloud Drive"].fb_isVisible);
   XCTAssertFalse(self.springboard.icons[@"IntegrationApp"].fb_isVisible);
 }
 
 - (void)testTableViewCells
 {
+  [self launchApplication];
   [self goToScrollPageWithCells:YES];
   for (int i = 0 ; i < 10 ; i++) {
     XCTAssertTrue(self.testedApplication.cells.allElementsBoundByIndex[i].fb_isVisible);
