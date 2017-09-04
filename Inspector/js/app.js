@@ -19,9 +19,6 @@ import TreeNode from 'js/tree_node';
 import TreeContext from 'js/tree_context';
 import Inspector from 'js/inspector';
 
-var React = require('react'); /* importing react */
-var ReactDOM = require('react-dom'); /* importing react-dom */
-
 require('css/app.css');
 
 const SCREENSHOT_ENDPOINT = 'screenshot';
@@ -112,7 +109,7 @@ class App extends React.Component {
                 fullTreeRefresh = { this.fetchFullTree.bind(this) }
                 rootNode = { this.state.rootNode }
                 refreshApp = {
-                    () => { this.refreshApp(); }/>
+                    () => { this.refreshApp(); }}/>
             <Tree onHighlightedNodeChange = {
                 (node) => {
                     this.setState({

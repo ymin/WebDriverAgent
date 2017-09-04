@@ -11,7 +11,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import HTTP from 'js/http';
 
-import HTTP from 'js/http';
 import GestureRecognizer from 'js/gesture_recognizer';
 
 var Button = require('react-button');
